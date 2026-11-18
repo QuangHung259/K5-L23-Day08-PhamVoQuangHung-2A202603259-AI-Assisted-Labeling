@@ -5,7 +5,7 @@
 - Lớp (L2 / L3 / khác): L2
 - Tài khoản GitHub: QuangHung259
 - Repo bài nộp (URL): https://github.com/QuangHung259/K5-L23-Day08-PhamVoQuangHung-2A202603259-AI-Assisted-Labeling
-- Commit chốt bài (hash): 00fbe1a (sẽ cập nhật hash commit cuối khi push)
+- Commit chốt bài (hash): ea422ad
 - Máy: Windows 11, CPU (không có GPU)
 - CVAT (Docker): v2.81.0
 
