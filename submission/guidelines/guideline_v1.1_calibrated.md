@@ -1,4 +1,4 @@
-# Label contract — Phố châu Á — BỔ SUNG v1.1 — <<MSHV - Họ tên>>
+# Label contract — Phố châu Á — BỔ SUNG v1.1 — 2A202603259 - Phạm Võ Quang Hưng
 
 > **Chỉ viết phần thay đổi so với v1.0** (không copy cả file). Chốt các câu hỏi mở ở mục 6 của v1.0 (hoặc nói rõ câu nào chưa chốt, vì sao)
 > và thêm quy tắc mới rút ra từ lỗi của máy / lỗi của bạn. Mỗi ca khó **có ảnh ví dụ** (`img_0xx`) và khớp một dòng trong `qc/calibration_decisions.csv`.
@@ -7,17 +7,26 @@
 
 | # | Câu hỏi | Quyết định | Ảnh ví dụ | `case_id` |
 |---|---|---|---|---|
-| <<1>> | <<xe đạp điện: bicycle hay motorbike?>> | <<>> | <<img_0xx>> | <<CAL-01>> |
+| 1 | Xe đạp điện / xe máy điện nhỏ: `bicycle` hay `motorbike`? | Phân loại theo kết cấu bàn đạp và khung sườn: nếu có bàn đạp chân và khung thanh mảnh kiểu xe đạp $\rightarrow$ `bicycle`; nếu có sàn để chân liền khối, yên dài, yếm nhựa kiểu scooter và không có bàn đạp $\rightarrow$ `motorbike`. | `img_018`, `img_024` | `CAL-01` |
+| 2 | Khối xe máy đỗ/chạy dày đặc: từng xe hay `ignore_region`? Ngưỡng cụ thể? | Xe nhìn thấy $\ge 20\%$ diện tích và chiều cao box $\ge 20\text{ px}$ $\rightarrow$ vẽ từng `motorbike`. Cụm $\ge 5$ xe dính sát nhau mà chiều cao $< 20\text{ px}$ hoặc bị che khuất $> 80\%$ không tách được từng chiếc $\rightarrow$ vẽ 1 box `ignore_region` bao cụm và **bắt buộc xóa** các box lẻ $< 20\text{ px}$ do máy sinh ra. | `img_005`, `img_018`, `img_024` | `CAL-02` |
+| 3 | Hàng nhô ra: xe đạp / ba gác chở hàng nhô xa: box và mask xe có gồm hàng không? | Chỉ gộp giỏ/thùng hàng gắn cố định vào cấu trúc xe. Hàng hóa rời (cây tre, bao tải, thùng xốp chất cao) nhô ra ngoài phạm vi khung xe $> 20\%$ chiều dài xe thì **không** đưa vào box và mask của xe. | `img_002`, `img_014` | `CAL-03` |
+| 4 | Người ngồi trong xe ba bánh có mui che: ngưỡng "còn thấy $\ge 20\%$" quy đổi thế nào để không lệch giữa các người gán? | Quy đổi trực quan: "còn thấy $\ge 20\%$" nghĩa là phải nhìn thấy rõ **tối thiểu trọn phần đầu kèm hai vai (hoặc nửa thân trên)** của người đó. Nếu chỉ thấy bóng mờ sau kính hoặc một bàn tay/chân rời rạc thì **không gán** `person`. | `img_004`, `img_013` | `CAL-04` |
+| 5 | Kính chắn gió / cửa sổ xe: thuộc mask xe hay không? | **Thuộc mask xe** (vì là bộ phận vật lý tạo nên hình khối xe). Tuy nhiên, đối với phần **hông xe hở không có kính** (như khoang tuk-tuk, xích lô), phần cơ thể người lái/hành khách lộ trực tiếp phải dùng click âm (`--neg`) để loại khỏi mask xe. | `img_004`, `img_013`, `img_032` | `CAL-04` |
+| 6 | Box máy chồng nhau quá nhiều trong ảnh đêm / ảnh đông: gộp hay giữ? | Giữ box riêng cho từng phương tiện thật (NMS IoU $\ge 0.6$ khi gộp pre-label đã lọc trùng bước đầu); nếu 2 box máy cùng chỉ vào **một** chiếc xe duy nhất (do máy bắt riêng phần đầu xe và thùng xe) thì xóa box thừa, giữ 1 box ôm trọn xe. | `img_005`, `img_028` | `CAL-02` |
+| 7 | Mức tin cậy tối thiểu (`conf`) để chấp nhận box máy không cần sửa: có đặt không? | **Không đặt ngưỡng `conf` để tự động bỏ qua bước kiểm tra bằng mắt.** Điểm `conf` cao (ví dụ $0.85$–$0.92$) vẫn có thể sai lớp (`truck`/`car` đè lên tuk-tuk ở `img_011`, `img_013`). `conf` chỉ dùng ở bước lọc pre-label đầu vào (`person=0.5, three_wheeler=0.15`, mặc định `0.3`). | `img_011`, `img_013` | `CAL-05` |
 
 ## 2. Ca khó mới (từ lỗi của máy, bẫy lọt, box `can_review`)
 
 | Ảnh | Tình huống | Máy làm gì (model nào) | Quyết định của bạn | Quy tắc mới (vào mục nào của v1.0) |
 |---|---|---|---|---|
-| <<img_0xx>> | <<>> | <<>> | <<>> | <<>> |
+| `img_002`, `img_013`, `img_032` | Xe tuk-tuk có mui và xích lô 3 bánh đỗ/chạy trên phố (`CAL-05`, nguồn `loi_may`) | **YOLO26** gọi nhầm tuk-tuk là `car` (`img_013`, `conf=0.42`) hoặc `truck` (`img_011`, `conf=0.77`); **YOLOE** bắt đúng lớp `three_wheeler` nhưng ở `img_032` chỉ đóng khung phần ghế khách phía trước, bỏ sót bánh và khung xe đạp gắn liền phía sau; **SAM 2.1** khi nhận box thiếu của YOLO26 thì sinh mask cụt đuôi xe và trùm luôn người lái (`img_013`). | Mọi xe 3 bánh (tuk-tuk, xích lô, ba gác) luôn gán `three_wheeler`. Với xích lô/ba gác, box và mask phải bao trọn **cả khoang ghế/thùng trước lẫn phần khung xe đạp/mô tô đẩy phía sau**, đồng thời tách riêng người đạp/người lái thành `person`. | **Mục 2 (`three_wheeler`) & Mục 5 (Ca khó):** Box/mask của `three_wheeler` phải ôm toàn bộ kết cấu 3 bánh liền khối (khoang khách + khung đạp sau), không tách rời phần đuôi xe thành `bicycle`/`motorbike`. |
+| `img_018`, `img_027`, `img_033`, `img_034` | Các xe máy/xe đạp nhỏ ở xa có chiều cao $14\text{ px}$–$19.8\text{ px}$ (`CAL-02`, nguồn `cau_hoi_mo` & `loi_may`) | **YOLO26** sinh các box nhỏ cao $< 20\text{ px}$ (ví dụ `img_018` có 5 box cao $14.3$–$19.8\text{ px}$, `img_027` có 2 box $16.9$–$17.2\text{ px}$), gây cảnh báo khi chạy `validate_labels.py`. | Xóa toàn bộ các box lẻ có chiều cao $< 20\text{ px}$ trong bước Rework/QC; nếu có từ 5 xe nhỏ sát nhau trở lên thì gom vào 1 vùng `ignore_region`. | **Mục 4.1.6:** Khi duyệt pre-label, bắt buộc kiểm tra và xóa các box máy có chiều cao $< 20\text{ px}$ ở hậu cảnh thay vì giữ nguyên (`accepted`). |
+| `img_006`, `img_009`, `img_013`, `img_034` | Bẫy lọt trong quá trình review (`CAL-06`, nguồn `bay_lot`) | Pre-label chứa bẫy nhân tạo: `wrong_class` (`img_009`: `person` $\rightarrow$ `bicycle`; `img_013`: `car` $\rightarrow$ `truck`), `missing` (`img_006`: xóa 1 `person` nhỏ ở xa), `loose` (`img_034`: làm lệch nhẹ box `motorbike`). | Phân biệt rõ: **đây là lỗi của người duyệt (thiên kiến tự động hóa), KHÔNG phải do guideline v1.0 mơ hồ.** Do đó không sửa định nghĩa lớp `car`/`truck` hay `person`/`bicycle`, mà bổ sung quy tắc bắt buộc trong quy trình duyệt. | **Ghi chú quy trình duyệt (kèm Mục 7 QC):** Bắt buộc ẩn nhãn máy 15 giây đầu để quét hậu cảnh (tránh lọt `missing` ở `img_006`) và kiểm tra lại tên lớp của mọi box ở xa (tránh lọt `wrong_class` ở `img_009`, `img_013`). |
 
 ## 3. Lịch sử thay đổi
 
 | Phiên bản | Thay đổi | Lý do (ca nào, `case_id`) |
 |---|---|---|
 | v1.0 | Bản giảng viên | — |
-| v1.1 | <<tóm tắt các thay đổi ở mục 1–2>> | <<>> |
+| v1.1 | (1) Chốt 7 câu hỏi mở mục 6: phân biệt xe đạp điện/xe máy điện theo bàn đạp (`CAL-01`), quy tắc xóa box máy $< 20\text{ px}$ và gom `ignore_region` (`CAL-02`), loại trừ hàng hóa rời nhô $> 20\%$ chiều dài xe (`CAL-03`), quy đổi ngưỡng che khuất $\ge 20\%$ cho người ngồi trong tuk-tuk và quy tắc mask kính xe vs hông xe hở (`CAL-04`). (2) Bổ sung ca khó cho ranh giới box/mask của xích lô & tuk-tuk từ lỗi máy YOLO26/YOLOE/SAM (`CAL-05`) và phân tách rõ lỗi thao tác review từ 4 bẫy lọt (`CAL-06`). | Đồng bộ quyết định giữa người duyệt, pre-label của máy và tiêu chuẩn QC sau vòng duyệt 24 ảnh batch (`CAL-01` đến `CAL-06`). |
+

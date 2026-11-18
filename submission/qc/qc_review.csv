@@ -1,0 +1,8 @@
+image,object_id,error_type,reviewer,note
+img_003.jpg,17,thua,PhamVoQuangHung,Box #17 three_wheeler (conf 0.25) o xa ben trai la box thua cua YOLOE de len doan xe may/nguoi o xa
+img_006.jpg,,bo_sot,PhamVoQuangHung,Bo sot 1 person di bo o giua hem xa (canh #58 person) - trung voi bay missing bi lot
+img_013.jpg,111,sai_lop,PhamVoQuangHung,Box #111 xe van/minivan trang phia sau bi gan nham la truck thay vi car (bay wrong_class bi lot)
+img_013.jpg,109,thua,PhamVoQuangHung,Box #109 three_wheeler o goc tren ben phai la box thua cua YOLOE bat nham phan duoi xe buyt/xe tai o xa
+img_014.jpg,126,sai_vi_tri_kich_thuoc,PhamVoQuangHung,Box #126 person (nguoi ganh hang rong) keo rong bao ca quang ganh va 2 thung hang hai ben thay vi chi om sat co the nguoi
+img_022.jpg,,khong,PhamVoQuangHung,Anh dem cho hoa (ca kho can_review) cac box person/motorbike/bus deu dung quy tac
+img_033.jpg,396,thua,PhamVoQuangHung,Box #396 motorbike o xa (canh trai #401 car) chi cao 18.6px (< 20px theo guideline muc 4.1.6 khong gan le)
